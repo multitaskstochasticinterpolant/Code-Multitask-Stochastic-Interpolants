@@ -23,7 +23,7 @@ The $\varphi^4$ model stem from statistical field theory, similar to the spin mo
 
 Inpainting enables you to sample a configuration close to the one at hand by masking some nodes of the discrete. This is ideal for sampling new lattices conditioned on the values of the unmasked nodes.
 
-On the other hand, posterior sampling considers the linearly shifted Boltzmann distribution: $p(E) ∝ e^(–\beta E + (h, \varphi)) = e^(–\beta E + h \sum\limits_{i \in \Lambda}\varphi\_i)$. Physically speaking, h plays the role of a magnetic field and shifts the spins' mean value. The quadratic case has also been theoretically investigated; some numerical experiments will be conducted in the coming months.
+On the other hand, posterior sampling considers the linearly shifted Boltzmann distribution: $p(E) ∝ e^{(–\beta E + (h, \varphi))} = e^{(–\beta E + h \sum\limits_{i \in \Lambda}\varphi\_i)}$. Physically speaking, h plays the role of a magnetic field and shifts the spins' mean value. The quadratic case has also been theoretically investigated; some numerical experiments will be conducted in the coming months.
 
 You should train the neural network from scratch here.
 
@@ -43,7 +43,7 @@ This section only covers a small part of the maze notebook. It comes after path 
 
 It heavily uses the gym environment [Point maze](https://robotics.farama.org/envs/maze/point_maze/), which runs upon complicated dependancies, such as the deprecated [d4rl](https://github.com/Farama-Foundation/D4RL) library. The code I use is an adapted replica of the `interact` function you can find [here](https://github.com/buoyancy99/diffusion-forcing/blob/main/algorithms/diffusion_forcing/df_planning.py#L261).
 
-Also, be careful, you need `python==3.10`, 'pip==21` and `setuptools==65.5.0`, no newer. I heavily recommend creating a conda virtual environment:
+Also, be careful, you need `python==3.10`, `pip==21` and `setuptools==65.5.0`, no newer. I heavily recommend creating a conda virtual environment:
 ```
 conda create -n maze-env python=3.10 pip=21 setuptools=65.5.0
 ```
@@ -64,14 +64,14 @@ Install `libosmesa6-dev` and `patchelf` package.
 sudo apt-get install libosmesa6-dev patchelf
 ```
 
-If you use `miniconda3` to manage your virtual environments, you should use the `.env` file I provide in the `maze` folder. Also, you need to load the environment variable `LD\_LIBRARY\_PATH` **before** the jupyter kernel starts, it is important. The only way to ensure it is the case is to directly specify its value in a configuration file. For VS Code IDE, it is called `settings.json`. Add the following line inside:
+If you use `miniconda3` to manage your virtual environments, you should use the `.env` file I provide in the `maze` folder. Also, you need to load the environment variable `LD\_LIBRARY\_PATH` **before** the jupyter kernel starts, it is important. The only solution is to directly specify its value in a configuration file. If your IDE is VS Code, search and open `settings.json` in the search bar activated by `CTRL+SHIFT+P`. Then, you qimply add the following line inside:
 
 ```
 {
   "python.envFile": "${workspaceFolder}/maze/.env",
 }
 ```
-to specify where to look for `.env` file.
+to specify where to look for `.env` file when loading the environment variable.
 
 ## Contact
 
