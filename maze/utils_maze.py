@@ -7,8 +7,6 @@ import h5py
 import os
 Tensor = type(torch.tensor([]))
 
-from model import VelocityFieldTS, Interpolant
-
 def get_maze_grid():
     """
     Return a string representation of the maze. '#' is a wall case, 'O' is a free case and 'G' is the goal case.
@@ -89,7 +87,7 @@ def in_cube(point, xy, side_size):
 
 def in_wall(point: np.ndarray):
     """
-    Return a boolean stating if a point lie inside a wall case.
+    Return a boolean stating if a point lie inside a wall box.
     """
     maze_grid = get_maze_grid()
     for i, row in enumerate(maze_grid):
@@ -100,7 +98,7 @@ def in_wall(point: np.ndarray):
 
 def count_in_wall(pathway, scaler=None):
     """
-    Count the number of point in pathway within a wall case.
+    Count the number of point in pathway within a wall box.
     """
     if scaler is not None:
         pathway = scaler.inverse_transform(pathway)
@@ -139,7 +137,7 @@ def plot_maze(obs: np.ndarray, scaler = None, path: str = None, title: str = Non
         scaler: Optional. To unnormalize obs. If set to None, the data are supposed to be already unnormalized.
         path (str): Optional. Indicate where to save the plot. If set to None, the plot is not saved.
         title (str): Optional. The plot title.
-        ax: Optional. The matplotlib axis on which you want to plot.
+        fig_ax: Optional. The matplotlib axis on which you want to plot.
         bar (bool). Optional. Whether to display a bar or not.
     Returns:
         A plot with the pathway traced on it with the maze as a background.
@@ -206,7 +204,7 @@ def plot_maze(obs: np.ndarray, scaler = None, path: str = None, title: str = Non
             draw_star((goal_x, goal_y), radius=0.08, ax=ax) #Add the star at the end of pathway
 
     if bar:
-        cbar = plt.colorbar(scatter)
+        cbar = plt.colorbar(scatter, shrink=1)
         cbar.ax.text(.7, 1.02, 'end', ha='center', va='bottom', transform=cbar.ax.transAxes, size = "large")
         cbar.ax.text(.7, -0.05, 'start', ha='center', va='top', transform=cbar.ax.transAxes, size = "large")
         cbar.set_ticks([])
@@ -221,7 +219,8 @@ env_id = "maze2d-medium-v1"
 
 def plot_maze_tmp(obs, pos_const = None, fig_ax = None, title=None, save_path: str=None, bar: bool=False):
     """
-    The data is assumed not normalized.
+    The data is assumed not normalized. There is no scaler as argument.s
+    Add a supplementary pin to locate the constraint in the maze.
     """
     if fig_ax is None:
         fig=plt.gcf()
@@ -268,6 +267,9 @@ def plot_maze_tmp(obs, pos_const = None, fig_ax = None, title=None, save_path: s
         ax.add_patch(star)
 
     def draw_rectangle(center, radius, num_points=5, color="black"):
+        """
+        Function to add an additional pin with a rectangular pattern to visualize the constraint enforced on the path. 
+        """
         points = []
         inner_radius=radius/2
         points.extend(
@@ -330,9 +332,10 @@ def plot_maze_tmp(obs, pos_const = None, fig_ax = None, title=None, save_path: s
     print("Done.")
 
 
-def plot_single_maze(obs: np.ndarray, Start_point, End_point, path: str = None, title: str = None, fig_ax=None, save: bool = False):
+def plot_maze_smooth(obs: np.ndarray, Start_point, End_point, path: str = None, title: str = None, fig_ax=None):
     """
-    Plot the pathway with the maze as background. The path data is assumed to be normalized.
+    Plot the pathway with the maze as background. The path data is assumed to be normalized, no scaler argument is proposed. No colorbar.
+    This function should be solely used to plot the maze with 
     Args:
         obs (np.ndarray): array data to plot in the maze.
         save (bool): Indicate whether save plot or not.
@@ -341,8 +344,11 @@ def plot_single_maze(obs: np.ndarray, Start_point, End_point, path: str = None, 
         ax: The matplotlib axis on which you want to plot.
     """
     
-     
-    fig, ax = fig_ax
+    if fig_ax is None:
+        fig=plt.gcf()
+        ax=plt.gca()
+    else:
+        fig, ax = fig_ax
     ax.tick_params(
         axis="both", which="both", bottom=False, top=False, left=False, right=False, labelbottom=False, labelleft=False)
 
@@ -387,92 +393,9 @@ def plot_single_maze(obs: np.ndarray, Start_point, End_point, path: str = None, 
     draw_star((goal_x, goal_y), radius=0.08, ax=ax) #Add the star
 
     print("Done.")
-    if not save:
-        assert path is None, "If you specify a path, you need to set 'save' to True."
-    else:
+    if path:
         fig.savefig(path)
 
-
-def smooth_out(plan: torch.Tensor):
-    """
-    Smooth out a path using 'maze2d-medium-v1' gym environment.
-    Args: 
-        plan (Tensor). Pathway to smooth out. plan should NOT be normalized.
-    Returns:
-        A new pathway very similar to plan, but built by the gym environment.
-    """
-    import gym
-    import d4rl
-    
-    envs = gym.make("maze2d-medium-v1", reward_type="dense")
-
-    plan_t = torch.tensor(plan)[:, np.newaxis]
-
-    envs.seed(0)
-
-    start=envs.reset(qposvel=(plan[0], [0, 0])) #Initialize the env with the start point
-
-    start=torch.tensor(start).float() #get the starting point, already normalized
-
-    obs = start
-
-    goal = np.array([envs.get_target()]).squeeze() #Get the goal location
-
-    goal = np.concatenate([goal, np.zeros(*goal.shape)], axis=-1) #Concatenate goal points with zero velocities.
-
-    steps = 0
-    episode_reward = np.zeros(batch_size)
-    episode_reward_if_stay = np.zeros(batch_size)
-    reached = np.zeros(batch_size, dtype=bool)
-    first_reach = np.zeros(batch_size)
-
-    trajectory = []  # actual trajectory
-    all_plan_hist = []  # a list of plan histories, each history is a collection of m diffusion steps
-
-    k = True
-
-    # while not terminate and steps < episode_len:
-    list_obs = start
-
-    list_vel = list_obs[np.newaxis, 2:]
-    list_obs = list_obs[np.newaxis, :2]
-
-    terminate = False
-    T=0
-
-    dist = []
-
-    while not terminate:
-
-        for t in range(open_loop_horizon):
-
-            if T + t >= len(plan_t):
-                terminate=True
-                break
-
-            plan_vel = plan_t[T + t] - plan_t[T + t - 1] if T + t > 0 else plan_t[0] - start[:2]
-            action = 12.5 * (plan_t[T + t] - obs[:2]) + 1.2 * (plan_vel - obs[2:])
-            action = torch.clip(action, -1, 1).detach().cpu()
-            obs, reward, done, info = envs.step(np.nan_to_num(action.numpy()))
-
-            reached = np.logical_or(reached, reward >= 1.0)
-            episode_reward += reward
-            episode_reward_if_stay += np.where(~reached, reward, 1)
-            first_reach += ~reached
-
-            distance = np.linalg.norm(obs[:2] - goal[:2])
-            dist += [distance]
-
-            # if done:
-            #     terminate = True #I guess terminate switch to True when a point reached the goal.
-            #     break
-
-            list_obs = np.append(list_obs, obs[np.newaxis, :2], axis=0)
-            list_vel = np.append(list_vel, obs[np.newaxis, 2:], axis=0)
-
-            steps += 1
-        T += open_loop_horizon
-    return 
 
 def find_length(start_point: np.ndarray, end_point: np.ndarray, device, scaler=None):
     """
@@ -494,8 +417,9 @@ def find_length(start_point: np.ndarray, end_point: np.ndarray, device, scaler=N
     #Convert to tensor
     start_point, end_point = torch.tensor(start_point, device=device), torch.tensor(end_point, device=device)
 
-    # TO CHANGE
+    #Path length
     length=300
+    #Number of path points between each generated points
     inter=6
     
     for idx in Time:

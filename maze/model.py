@@ -193,10 +193,7 @@ class UNet(nn.Module):
         super().__init__()
 
         # Create model architecture
-        # channels = [32, 64, 128, 256]
-        # channels = [48, 80, 160, 256] #Architecture for L50
-        channels = [80, 160, 256, 512] #Architecture for L100
-        # channels = [32, 64, 80, 128]
+        channels = [80, 160, 256, 512] #Architecture for L50
         attention_channel = channels[-2:]
         self.encoder = nn.ModuleList([nn.ModuleList([nn.Conv2d(in_channels=TS_channel, out_channels=channels[0], kernel_size=(5,3), padding=(2, 1))])])
         self.decoder = nn.ModuleList()
