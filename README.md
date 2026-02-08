@@ -55,7 +55,7 @@ Then, type in the CLI:
 pip install -r requirements.txt extra_requirements.txt
 ```
 
-To install Mujoco, download the archive [here](https://github.com/openai/mujoco-py?tab=readme-ov-file#install-mujoco)
+To install Mujoco, download the archive [here](https://github.com/openai/mujoco-py?tab=readme-ov-file#install-mujoco) and follow the instructions. The `.mujoco` folder is certainly at `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/.mujoco` if you use miniconda, or `$HOME/anaconda3/envs/maze-env/lib/python3.10/site-packages/.mujoco` if you use anacond.
 
 When first imported, `d4rl` set up `mujoco\_py` by compiling a Cython file. It is a complicated pre-processing step, I encountered a lot of issues when I tried to import `d4rl` on the first time. You should follow the next instructions carefully:
 
@@ -64,7 +64,7 @@ Install `libosmesa6-dev` and `patchelf` package.
 sudo apt-get install libosmesa6-dev patchelf
 ```
 
-If you use `miniconda3` to manage your virtual environments, you should use the `.env` file I provide in the `maze` folder. Also, you need to load the environment variable `LD\_LIBRARY\_PATH` **before** the jupyter kernel starts, it is important. The only solution is to directly specify its value in a configuration file. If your IDE is VS Code, search and open `settings.json` in the search bar activated by `CTRL+SHIFT+P`. Then, you qimply add the following line inside:
+If you use `miniconda3` to manage your virtual environments, you should use the `.env` file I provide in the `maze` folder. Also, you need to load the environment variable `LD\_LIBRARY\_PATH` **before** the jupyter kernel starts, it is important. The only solution is to directly specify its value in a configuration file. If your IDE is VS Code, search and open `settings.json` in the search bar activated by `CTRL+SHIFT+P`. Then, you simply add the following line inside:
 
 ```
 {
@@ -72,6 +72,8 @@ If you use `miniconda3` to manage your virtual environments, you should use the 
 }
 ```
 to specify where to look for `.env` file when loading the environment variable.
+
+Finally, I had to make a small modifications in two of the files called by `env.reset()`. The native `gym` library would not allow me to specify the path starting point. To add this feature, you should replace the files `mujoco_env.py` and `maze_model.py` at `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/gym/envs/mujoco/` and `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/d4rl/pointmaze` by the ones I provide.
 
 ## Contact
 
