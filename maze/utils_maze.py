@@ -219,7 +219,7 @@ env_id = "maze2d-medium-v1"
 
 def plot_maze_tmp(obs, pos_const = None, fig_ax = None, title=None, save_path: str=None, bar: bool=False):
     """
-    The data is assumed not normalized. There is no scaler as argument.s
+    The data is assumed not normalized. There is no scaler as argument.
     Add a supplementary pin to locate the constraint in the maze.
     """
     if fig_ax is None:
