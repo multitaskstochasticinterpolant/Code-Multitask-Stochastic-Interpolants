@@ -19,7 +19,7 @@ We performed on the **MNIST dataset**. Adapting it to higher-dimensional image i
 
 ### $\varphi^4$ model of spins
 
-The $\varphi^4$ model stem from statistical field theory, similar to the spin model but where the field can take continuous values on the nodes of a discrete lattice $\Lambda$. An challenge of paramount importance in physics is the computation of expectation over all field's configuration. The probability of measuring a given field configuration with energy $E$ is given by Boltzmann distribution: $p(E)=Z^{-1}e^{-\beta E}$. Unfortunately, in the high-dimensional setting and near phase transition, sampling a configuration is computationnaly very challenging, it can introduce bias or is very time consuming. In this context, inpainting and posterior sampling can be of great help.
+The $\varphi^4$ model stem from statistical field theory, similar to the spin model but where the field can take continuous values on the nodes of a discrete lattice $\Lambda$. An challenge of paramount importance in physics is the computation of expectation over all field's configuration. The probability of measuring a given field configuration with energy $E$ is given by Boltzmann distribution: $p(E)=Z^{-1}e^{-\beta E}$. Unfortunately, in the high-dimensional setting and near phase transition, sampling a configuration is computationally very challenging, it can introduce bias or is very time consuming. In this context, inpainting and posterior sampling can be of great help.
 
 Inpainting enables you to sample a configuration close to the one at hand by masking some nodes of the discrete. This is ideal for sampling new lattices conditioned on the values of the unmasked nodes.
 
@@ -73,7 +73,7 @@ If you use `miniconda3` to manage your virtual environments, you should use the 
 ```
 to specify where to look for `.env` file when loading the environment variable.
 
-Finally, I had to make a small modifications in two of the files called by `env.reset()`. The native `gym` library would not allow me to specify the path starting point. To add this feature, you should replace the files `mujoco_env.py` and `maze_model.py` at `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/gym/envs/mujoco/` and `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/d4rl/pointmaze` by the ones I provide.
+Finally, I had to make a small modifications in two of the files called by `env.reset()`. The native `gym` library would not allow me to specify the path starting point. To add this feature, you should replace the files `mujoco_env.py` and `maze_model.py` at `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/gym/envs/mujoco/` and `$HOME/miniconda3/envs/maze-env/lib/python3.10/site-packages/d4rl/pointmaze` respectively by the one provided in the folder.
 
 ## Contact
 
