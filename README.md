@@ -2,9 +2,8 @@
 
 This repository contains the code to reproduce some of the numerical experiments displayed in the paper [multitask learning with Stochastic Interpolants](https://arxiv.org/abs/2508.04605). More specifically, you can find the notebooks written for the MNIST, $\varphi^4$ and maze experiments. Feel free to check out the [website](https://multitaskstochasticinterpolant.github.io/) for visual illustrations!
 
-The weights of no models are made public; you need to train the neural networks yourself.
+The weights of no models are made public; you need to train the neural networks yourself. If you have problem running the code, don't hesitate to contact me, see below.
 
-**TO DO: Modify the arxiv paper to add the repo's link**
 
 ### Overview
 
@@ -15,7 +14,7 @@ This paper introduces an operator-based paradigm for generating data with stocha
 
 ### MNIST
 
-We performed on the **MNIST dataset**. Adapting it to higher-dimensional image is no tough challenge though. To demonstrate the variety of inpainting task our model can perform, we use a large range of mask. Notice how a figure can mutate (e.g. a $6$ transform into a $3$) when you apply the mask and make the underlying value ambiguous. Running the notebook should be straightforward.
+We performed *inpainting* on the **MNIST dataset**. Adapting it to higher-dimensional image is no tough challenge though. To demonstrate the variety of inpainting task our model can perform, we use a large range of mask. Notice how a figure can mutate (e.g. a $6$ transform into a $3$) when you apply the mask and make the underlying value ambiguous. Running the notebook should be straightforward.
 
 ### $\varphi^4$ model of spins
 
